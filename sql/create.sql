@@ -1,3 +1,13 @@
+DROP SCHEMA IF EXISTS ItDa;
+CREATE SCHEMA IF NOT EXISTS ItDa DEFAULT CHARACTER SET utf8;
+USE ItDa;
+
+-- -----------------------------
+
+DROP TABLE IF EXISTS ItDa.Users;
+DROP TABLE IF EXISTS ItDa.Memories;
+DROP TABLE IF EXISTS ItDa.DateCourses;
+
 CREATE TABLE `Users` (
    `user_id`   BIGINT   NOT NULL,
    `user_password`   VARCHAR(255)   NOT NULL,
