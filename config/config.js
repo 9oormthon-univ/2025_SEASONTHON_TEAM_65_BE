@@ -3,7 +3,7 @@ export default {
   'SERVER_PORT' : 3000,
   'BASE_URL' : '/ItDa/api/v1',
   'DB': {
-    'DATABASE': 'socialLoginProject',
+    'DATABASE': 'ItDa',
     'PORT': 3306,
     'DB_CONNECTION_LIMIT': 10
   }

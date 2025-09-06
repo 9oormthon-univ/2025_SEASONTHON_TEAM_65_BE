@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import { ping } from './controller/system.js';
 import config from './config/config.js';
+import { getAllUsers } from './repository/user.js';
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,9 +13,11 @@ app.use(cors());
 const router = express.Router();
 
 router.route('/ping').get(ping);
+router.route('/users').get(getAllUsers);
 
 app.use(config.BASE_URL,router);
 app.listen(config.SERVER_PORT, () => {
   console.log(`Server is running at http://localhost:${config.SERVER_PORT}${config.BASE_URL}/`);  
 });
+
 // http://localhost:3000/ItDa/api/v1/
