@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { ping } from './controller/system.js';
-import { getMemories, getMemoryDetail } from './controller/memory.js';
+import { getMemories, getMemoryDetail, createMemoryRecord } from './controller/memory.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
 import { setupSwagger } from './config/swagger.js'; 
@@ -18,6 +18,7 @@ router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
 router.route('/memories').get(getMemories);
 router.route('/memory/:userId/:memoryId').get(getMemoryDetail);
+router.route('/memory/:userId').post(createMemoryRecord);
 
 app.use(config.BASE_URL, router);
 

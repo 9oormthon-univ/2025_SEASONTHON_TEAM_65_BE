@@ -1,6 +1,6 @@
 'use strict';
 import { consoleBar, timeLog, resSend } from "../config/common.js";
-import { getMemoriesByUserId, getMemoryById } from '../repository/memory.js';
+import { getMemoriesByUserId, getMemoryById, createMemory } from '../repository/memory.js';
 
 /**
  * @swagger
@@ -160,4 +160,44 @@ const getMemoryDetail = async (req, res) => {
   timeLog(`[GET] /memory/${userId}/${memoryId} Get memory detail called`);
 };
 
-export { getMemories, getMemoryDetail };
+
+
+const createMemoryRecord = async (req, res) => {
+  const { userId } = req.params;
+  const { courseId, imageUrl, mothersQuote, activityDate, myFeeling } = req.body;
+  
+  if (!userId || !courseId) {
+    return resSend(res, {
+      status: 'error',
+      message: 'userId, courseId are required'
+    });
+  }
+
+  try {
+    const memoryData = {
+      userId,
+      courseId,
+      imageUrl: imageUrl || null,
+      mothersQuote: mothersQuote || null,
+      activityDate: activityDate || null,
+      myFeeling: myFeeling || null
+    };
+    
+    const newMemoryId = await createMemory(memoryData);
+    
+    resSend(res, {
+      status: 'success',
+    });
+  } catch (error) {
+    console.log(error);
+    resSend(res, {
+      status: 'error',
+      message: 'Database Error'
+    });
+  }
+  
+  consoleBar();
+  timeLog(`[POST] /memory/${userId} Create memory called // memoryId: ${newMemoryId}`);
+};
+
+export { getMemories, getMemoryDetail, createMemoryRecord };
