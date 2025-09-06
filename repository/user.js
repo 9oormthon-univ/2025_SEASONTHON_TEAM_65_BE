@@ -1,4 +1,5 @@
 'use strict';
+import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -50,6 +51,106 @@ import { pool } from './connect.js';
  *                         format: date-time
  */
 
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: 새로운 사용자 등록
+ *     description: 새로운 사용자를 등록하고 고유한 userId를 반환합니다.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userEmail
+ *               - userPassword
+ *               - userName
+ *             properties:
+ *               userEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               userPassword:
+ *                 type: string
+ *                 example: your_password
+ *               userName:
+ *                 type: string
+ *                 example: 김민지
+ *               profileImgUrl:
+ *                 type: string
+ *                 example: https://example.com/profile.jpg
+ *     responses:
+ *       201:
+ *         description: 사용자 등록 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                   example: 550e8400-e29b-41d4-a716-446655440000
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Failed to create user
+ */
+// ---------[post]create-user---------
+const createUser = async (req, res) => {
+    try {
+        const { userEmail, userPassword, userName, profileImgUrl } = req.body;
+        timeLog('POST /signup - Request received');
+        
+        // Generate unique userId
+        const userId = uuidv4();
+        
+        const query = `
+            INSERT INTO user (user_id, user_email, user_password, user_name, profile_img_url)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        
+        const connection = await pool.getConnection(async conn => conn);
+        try {
+            await connection.query(query, [userId, userEmail, userPassword, userName, profileImgUrl]);
+            timeLog('POST /signup - User created successfully');
+            return res.json({
+                userId,
+                status: "success"
+            });
+        } catch (err) {
+            console.error('Query Error:', err);
+            return res.status(500).json({
+                status: "error",
+                message: "Failed to create user"
+            });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('DB Error:', error);
+        return res.status(500).json({
+            status: "error",
+            message: "Database connection error"
+        });
+    }
+};
+
 // ---------[get]all-users---------
 
 const getAllUsers = async (req, res) => {
@@ -78,4 +179,4 @@ const getAllUsers = async (req, res) => {
   timeLog('GET all-users called // ' + JSON.stringify(req.query) + ' // ' + JSON.stringify(results));
 };
 
-export { getAllUsers };
+export { getAllUsers, createUser };
