@@ -4,7 +4,8 @@ import cors from 'cors';
 
 import { ping } from './controller/system.js';
 import config from './config/config.js';
-import { getAllUsers, createUser } from './repository/user.js';
+import { getAllUsers } from './repository/user.js';
+import { createUser, loginUser } from './controller/user.js';
 import { setupSwagger } from './config/swagger.js';
 
 const app = express();
@@ -16,6 +17,7 @@ const router = express.Router();
 router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
 router.route('/signup').post(createUser);
+router.route('/login').post(loginUser);
 
 app.use(config.BASE_URL, router);
 

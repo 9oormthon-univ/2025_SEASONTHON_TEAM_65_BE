@@ -53,6 +53,82 @@ import { pool } from './connect.js';
 
 /**
  * @swagger
+ * /login:
+ *   post:
+ *     summary: 사용자 로그인
+ *     description: 이메일과 비밀번호로 로그인합니다.
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userEmail
+ *               - userPassword
+ *             properties:
+ *               userEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               userPassword:
+ *                 type: string
+ *                 example: your_password
+ *     responses:
+ *       200:
+ *         description: 로그인 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userEmail:
+ *                   type: string
+ *                   example: user@example.com
+ *                 userPassword:
+ *                   type: string
+ *                   example: your_password
+ *                 userName:
+ *                   type: string
+ *                   example: 김민지
+ *                 profileImgUrl:
+ *                   type: string
+ *                   example: https://example.com/profile.jpg
+ *                 created:
+ *                   type: string
+ *                   format: date-time
+ *                 updated:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: 로그인 실패 - 잘못된 이메일 또는 비밀번호
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Invalid email or password
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Database connection error
+ *
  * /signup:
  *   post:
  *     summary: 새로운 사용자 등록
@@ -112,42 +188,25 @@ import { pool } from './connect.js';
  *                   example: Failed to create user
  */
 // ---------[post]create-user---------
-const createUser = async (req, res) => {
+const createUser = async (userData) => {
+    const { id, email, password, name, profileImgUrl } = userData;
+    timeLog('Creating new user');
+    
+    const query = `
+        INSERT INTO user (user_id, user_email, user_password, user_name, profile_img_url)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    
+    const connection = await pool.getConnection(async conn => conn);
     try {
-        const { userEmail, userPassword, userName, profileImgUrl } = req.body;
-        timeLog('POST /signup - Request received');
-        
-        // Generate unique userId
-        const userId = uuidv4();
-        
-        const query = `
-            INSERT INTO user (user_id, user_email, user_password, user_name, profile_img_url)
-            VALUES (?, ?, ?, ?, ?)
-        `;
-        
-        const connection = await pool.getConnection(async conn => conn);
-        try {
-            await connection.query(query, [userId, userEmail, userPassword, userName, profileImgUrl]);
-            timeLog('POST /signup - User created successfully');
-            return res.json({
-                userId,
-                status: "success"
-            });
-        } catch (err) {
-            console.error('Query Error:', err);
-            return res.status(500).json({
-                status: "error",
-                message: "Failed to create user"
-            });
-        } finally {
-            connection.release();
-        }
-    } catch (error) {
-        console.error('DB Error:', error);
-        return res.status(500).json({
-            status: "error",
-            message: "Database connection error"
-        });
+        await connection.query(query, [id, email, password, name, profileImgUrl]);
+        timeLog('User created successfully');
+        return { success: true };
+    } catch (err) {
+        console.error('Query Error:', err);
+        throw new Error('Failed to create user');
+    } finally {
+        connection.release();
     }
 };
 
@@ -179,4 +238,35 @@ const getAllUsers = async (req, res) => {
   timeLog('GET all-users called // ' + JSON.stringify(req.query) + ' // ' + JSON.stringify(results));
 };
 
-export { getAllUsers, createUser };
+const findUserByCredentials = async (email, password) => {
+  timeLog('Finding user by credentials');
+
+  const query = `
+    SELECT user_email, user_password, user_name, profile_img_url, created, updated
+    FROM user
+    WHERE user_email = ? AND user_password = ?
+  `;
+
+  const connection = await pool.getConnection(async conn => conn);
+  try {
+    const [rows] = await connection.query(query, [email, password]);
+    
+    if (rows.length === 0) {
+      return null;
+    }
+
+    timeLog('User found successfully');
+    return {
+      userEmail: rows[0].user_email,
+      userPassword: rows[0].user_password,
+      userName: rows[0].user_name,
+      profileImgUrl: rows[0].profile_img_url,
+      created: rows[0].created,
+      updated: rows[0].updated
+    };
+  } finally {
+    connection.release();
+  }
+};
+
+export { getAllUsers, createUser, findUserByCredentials };
