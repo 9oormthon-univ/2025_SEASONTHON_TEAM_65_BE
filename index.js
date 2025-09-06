@@ -5,6 +5,7 @@ import cors from 'cors';
 import { ping } from './controller/system.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
+import { setupSwagger } from './config/swagger.js'; 
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,9 +16,13 @@ const router = express.Router();
 router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
 
-app.use(config.BASE_URL,router);
+app.use(config.BASE_URL, router);
+
+setupSwagger(app, config.SERVER_PORT);
+
 app.listen(config.SERVER_PORT, () => {
   console.log(`Server is running at http://localhost:${config.SERVER_PORT}${config.BASE_URL}/`);  
 });
 
 // http://localhost:3000/ItDa/api/v1/
+// http://localhost:3000/ItDa/api-docs
