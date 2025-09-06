@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import * as userRepository from '../repository/user.js';
 
 export const createUser = async (req, res) => {
