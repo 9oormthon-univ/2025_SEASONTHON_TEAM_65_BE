@@ -161,7 +161,47 @@ const getMemoryDetail = async (req, res) => {
 };
 
 
-
+/**
+ * @swagger
+ * /memory/{userId}:
+ *   post:
+ *     summary: 추억 앨범 기록 생성
+ *     tags: [Memories]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 사용자 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               courseId:
+ *                 type: integer
+ *               imageUrl:
+ *                 type: string
+ *               mothersQuote:
+ *                 type: string
+ *               activityDate:
+ *                 type: string
+ *               myFeeling:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 추억 생성 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ */
 const createMemoryRecord = async (req, res) => {
   const { userId } = req.params;
   const { courseId, imageUrl, mothersQuote, activityDate, myFeeling } = req.body;
