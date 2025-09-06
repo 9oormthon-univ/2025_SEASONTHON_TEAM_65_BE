@@ -7,6 +7,7 @@ import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
 import { createUser, loginUser } from './controller/user.js';
 import { getAllCourses } from './repository/course.js';
+import { getCourse} from './controller/course.js';
 import { setupSwagger } from './config/swagger.js';
 
 const app = express();
@@ -20,6 +21,7 @@ router.route('/users').get(getAllUsers);
 router.route('/signup').post(createUser);
 router.route('/login').post(loginUser);
 router.route('/courses').get(getAllCourses);
+router.route('/course/:courseId').get(getCourse);
 
 app.use(config.BASE_URL, router);
 
