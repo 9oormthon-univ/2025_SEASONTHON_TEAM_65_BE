@@ -3,9 +3,13 @@ import express from 'express';
 import cors from 'cors';
 
 import { ping } from './controller/system.js';
+import { getMemories, getMemoryDetail, createMemoryRecord } from './controller/memory.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
-import { setupSwagger } from './config/swagger.js'; 
+import { createUser, loginUser } from './controller/user.js';
+import { getAllCourses } from './repository/course.js';
+import { getCourse} from './controller/course.js';
+import { setupSwagger } from './config/swagger.js';
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,6 +19,13 @@ const router = express.Router();
 
 router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
+router.route('/memories').get(getMemories);
+router.route('/memory/:userId/:memoryId').get(getMemoryDetail);
+router.route('/memory/:userId').post(createMemoryRecord);
+router.route('/signup').post(createUser);
+router.route('/login').post(loginUser);
+router.route('/courses').get(getAllCourses);
+router.route('/course/:courseId').get(getCourse);
 
 app.use(config.BASE_URL, router);
 

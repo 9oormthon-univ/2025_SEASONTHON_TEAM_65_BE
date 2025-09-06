@@ -4,37 +4,67 @@ USE ItDa;
 
 -- -----------------------------
 
-DROP TABLE IF EXISTS ItDa.user;
+DROP TABLE IF EXISTS ItDa.Users;
+DROP TABLE IF EXISTS ItDa.Memories;
+DROP TABLE IF EXISTS ItDa.DateCourses;
 
-CREATE TABLE user (
-  user_id VARCHAR(60),
-  user_name VARCHAR(20),
-  user_password VARCHAR(255),
-  user_email VARCHAR(255),
-  profile_img_url VARCHAR(255),
+CREATE TABLE Users (
+  user_id BIGINT NOT NULL AUTO_INCREMENT,
+  user_password VARCHAR(255) NOT NULL,
+  user_name VARCHAR(50) NOT NULL,
+  user_profille_url VARCHAR(255),
+  email VARCHAR(255) NOT NULL,
   created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  PRIMARY KEY(user_id)
+  PRIMARY KEY (user_id)
 );
 
--- -----------------------------
+CREATE TABLE Memories (
+  memory_id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  course_id BIGINT NOT NULL,
+  activity_date DATETIME NOT NULL,
+  image_url VARCHAR(255),
+  mothers_quote TEXT,
+  my_feeling TEXT,
+  created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (memory_id)
+);
 
-INSERT INTO user (user_id, user_name, user_password, user_email, profile_img_url)
-VALUES
-('user01', '박근원', 'pass01', 'user01@email.com', 'https://example.com/img01.png'),
-('user02', '김기재', 'pass02', 'user02@email.com', 'https://example.com/img02.png'),
-('user03', '이수민', 'pass03', 'user03@email.com', 'https://example.com/img03.png'),
-('user04', '최지훈', 'pass04', 'user04@email.com', 'https://example.com/img04.png'),
-('user05', '정유진', 'pass05', 'user05@email.com', 'https://example.com/img05.png'),
-('user06', '한지은', 'pass06', 'user06@email.com', 'https://example.com/img06.png'),
-('user07', '오세훈', 'pass07', 'user07@email.com', 'https://example.com/img07.png'),
-('user08', '윤서영', 'pass08', 'user08@email.com', 'https://example.com/img08.png'),
-('user09', '장민수', 'pass09', 'user09@email.com', 'https://example.com/img09.png'),
-('user10', '백승우', 'pass10', 'user10@email.com', 'https://example.com/img10.png');
+CREATE TABLE DateCourses (
+  course_id BIGINT NOT NULL AUTO_INCREMENT,
+  course_title VARCHAR(255) NOT NULL,
+  course_description TEXT,
+  course_image_url VARCHAR(255),
+  course_schedule TEXT,
+  course_tag INT,
+  created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (course_id)
+);
 
--- ----------------------------
+-- Users 더미 데이터
+INSERT INTO Users (user_password, user_name, user_profille_url, email) VALUES
+('pw123', 'Alice', 'https://example.com/profiles/alice.jpg', 'alice@example.com'),
+('pw234', 'Bob', 'https://example.com/profiles/bob.jpg', 'bob@example.com'),
+('pw345', 'Charlie', NULL, 'charlie@example.com'),
+('pw456', 'Diana', 'https://example.com/profiles/diana.png', 'diana@example.com'),
+('pw567', 'Eve', NULL, 'eve@example.com');
 
--- SELECT userId, userName FROM user ORDER BY created LIMIT 1;
--- SELECT userName FROM user WHERE userId='asd';
--- DELETE FROM user WHERE userName='박근원';
--- UPDATE user SET userId='dsa' WHERE userName='김기재';
+-- DateCourses 더미 데이터
+INSERT INTO DateCourses (course_title, course_description, course_image_url, course_schedule, course_tag) VALUES
+('Cooking Class', 'Learn to cook Italian dishes.', 'https://example.com/courses/cooking.jpg', 'Every Saturday 10AM', 1),
+('Yoga Basics', 'Introductory yoga for beginners.', 'https://example.com/courses/yoga.jpg', 'Mon/Wed/Fri 7AM', 2),
+('Photography', 'Basics of DSLR photography.', NULL, 'Weekend mornings', 3),
+('Painting Workshop', 'Learn watercolor painting.', 'https://example.com/courses/painting.png', 'Sundays 2PM', 4),
+('Coding Bootcamp', 'Web development fundamentals.', 'https://example.com/courses/coding.png', 'Weekdays 6PM', 5);
+
+-- Memories 더미 데이터
+INSERT INTO Memories (user_id, course_id, activity_date, image_url, mothers_quote, my_feeling) VALUES
+(1, 1, '2025-09-01 10:00:00', 'https://example.com/memories/alice_cooking.jpg', 'Food brings people together.', 'Excited and happy'),
+(2, 2, '2025-09-02 07:00:00', NULL, 'Health is wealth.', 'Relaxed and calm'),
+(3, 3, '2025-09-03 09:00:00', 'https://example.com/memories/charlie_photo.png', NULL, 'Inspired by nature'),
+(4, 4, '2025-09-04 14:00:00', NULL, 'Creativity takes courage.', 'Focused and creative'),
+(5, 5, '2025-09-05 18:00:00', 'https://example.com/memories/eve_code.jpg', 'Learning never ends.', 'Motivated and curious');
+
