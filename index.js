@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { ping } from './controller/system.js';
+import { getMemories } from './controller/memory.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
 import { setupSwagger } from './config/swagger.js'; 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
+router.route('/memories').get(getMemories);
 
 app.use(config.BASE_URL, router);
 
