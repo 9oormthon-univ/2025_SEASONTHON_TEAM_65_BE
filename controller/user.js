@@ -12,12 +12,8 @@ export const createUser = async (req, res) => {
             });
         }
         
-        // Generate unique userId
-        const userId = uuidv4();
-        
         // Create user
-        await userRepository.createUser({
-            id: userId,
+        const result = await userRepository.createUser({
             email: userEmail,
             password: userPassword,
             name: userName,
@@ -25,7 +21,7 @@ export const createUser = async (req, res) => {
         });
         
         return res.status(201).json({
-            userId,
+            userId: result.userId,
             status: "success"
         });
     } catch (error) {

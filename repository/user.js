@@ -189,19 +189,23 @@ import { pool } from './connect.js';
  */
 // ---------[post]create-user---------
 const createUser = async (userData) => {
-    const { id, email, password, name, profileImgUrl } = userData;
+    const { email, password, name, profileImgUrl } = userData;
     timeLog('Creating new user');
     
     const query = `
-        INSERT INTO user (user_id, user_email, user_password, user_name, profile_img_url)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO Users (user_id, user_password, user_name, user_profille_url, email, created, updated)
+        VALUES (?, ?, ?, ?, ?, NOW(), NOW())
     `;
     
     const connection = await pool.getConnection(async conn => conn);
     try {
-        await connection.query(query, [id, email, password, name, profileImgUrl]);
+        // Get the maximum user_id and increment by 1
+        const [maxIdResult] = await connection.query('SELECT MAX(user_id) as maxId FROM Users');
+        const userId = (maxIdResult[0].maxId || 0) + 1;
+        
+        await connection.query(query, [userId, password, name, profileImgUrl, email]);
         timeLog('User created successfully');
-        return { success: true };
+        return { success: true, userId };
     } catch (err) {
         console.error('Query Error:', err);
         throw new Error('Failed to create user');
@@ -213,7 +217,7 @@ const createUser = async (userData) => {
 // ---------[get]all-users---------
 
 const getAllUsers = async (req, res) => {
-  const query = 'SELECT * FROM user';
+  const query = 'SELECT user_id, user_name, email, user_profille_url, created, updated FROM Users';
   const results = {};
   results.result = true;
   results.error = [];
@@ -242,9 +246,9 @@ const findUserByCredentials = async (email, password) => {
   timeLog('Finding user by credentials');
 
   const query = `
-    SELECT user_email, user_password, user_name, profile_img_url, created, updated
-    FROM user
-    WHERE user_email = ? AND user_password = ?
+    SELECT email, user_password, user_name, user_profille_url, created, updated
+    FROM Users
+    WHERE email = ? AND user_password = ?
   `;
 
   const connection = await pool.getConnection(async conn => conn);
@@ -257,10 +261,10 @@ const findUserByCredentials = async (email, password) => {
 
     timeLog('User found successfully');
     return {
-      userEmail: rows[0].user_email,
+      userEmail: rows[0].email,
       userPassword: rows[0].user_password,
       userName: rows[0].user_name,
-      profileImgUrl: rows[0].profile_img_url,
+      profileImgUrl: rows[0].user_profille_url,
       created: rows[0].created,
       updated: rows[0].updated
     };
