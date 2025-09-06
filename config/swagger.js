@@ -20,7 +20,7 @@ const setupSwagger = (app, serverPort) => {
                 }
             ],
         },
-        apis: ['./repository/*.js'], // 경로를 repository 폴더로 변경
+        apis: ['./controller/*.js', './repository/*.js'], // controller와 repository 폴더 모두 포함
     };
 
     const specs = swaggerJsdoc(options);

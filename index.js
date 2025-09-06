@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { ping } from './controller/system.js';
+import { getMemories, getMemoryDetail, createMemoryRecord } from './controller/memory.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
 import { createUser, loginUser } from './controller/user.js';
@@ -18,6 +19,9 @@ const router = express.Router();
 
 router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
+router.route('/memories').get(getMemories);
+router.route('/memory/:userId/:memoryId').get(getMemoryDetail);
+router.route('/memory/:userId').post(createMemoryRecord);
 router.route('/signup').post(createUser);
 router.route('/login').post(loginUser);
 router.route('/courses').get(getAllCourses);
