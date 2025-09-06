@@ -6,6 +6,7 @@ import { ping } from './controller/system.js';
 import config from './config/config.js';
 import { getAllUsers } from './repository/user.js';
 import { createUser, loginUser } from './controller/user.js';
+import { getAllCourses } from './repository/course.js';
 import { setupSwagger } from './config/swagger.js';
 
 const app = express();
@@ -18,6 +19,7 @@ router.route('/ping').get(ping);
 router.route('/users').get(getAllUsers);
 router.route('/signup').post(createUser);
 router.route('/login').post(loginUser);
+router.route('/courses').get(getAllCourses);
 
 app.use(config.BASE_URL, router);
 
